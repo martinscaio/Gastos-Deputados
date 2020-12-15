@@ -1,6 +1,4 @@
-
 library(tidyverse)
-library(readxl)
 library(ggplot2)
 
 
@@ -16,7 +14,8 @@ df2 <- df %>% rename(NomeParlamentar = X.U.FEFF.txNomeParlamentar,
 
 df <- df %>% filter(!is.na(cpf))
 
-#Gastos por partido
+# GASTOS POR PARTIDO
+
 gasto_partido <- df2 %>%
   filter(numMes > 1 & !is.na(cpf)) %>%
   group_by(sgPartido) %>%
@@ -26,7 +25,8 @@ gasto_partido <- df2 %>%
   rename(partido = sgPartido)
 
 
-# gráfico dos partidos que mais gastaram
+# GRAFICO DOS PARTIDOS QUE MAIS GASTARAM EM 2019
+
 gasto_partido %>%
   ggplot(aes(fct_reorder(partido, valor_milhoes), valor_milhoes)) +
   geom_col()+
@@ -38,14 +38,16 @@ gasto_partido %>%
   ggtitle("PARTIDOS QUE MAIS GASTARAM NO ANO DE 2019")
 
 
-#gastos por atividades
+# GASTOS POR ATIVIDADES
+
 gasto_atividades <-  df2 %>% filter(!Descrição == "PASSAGEM AÉREA - SIGEPA" & numMes > 1 & !is.na(cpf)) %>%
   group_by(Descrição) %>%
   summarize(valor = sum(Valor_liquido)/1e06) %>%
   arrange(desc(valor))
 
 
-#grafico gastos por atividades
+# GRAFICO DE GASTOS POR ATIVIDADES
+
 gasto_atividades %>%
   ggplot(aes(fct_reorder(Descrição, valor), valor))+
   geom_col()+
@@ -82,6 +84,7 @@ gastos_deputados<- df2 %>%
   arrange(desc(valor)) %>%
   select(NomeParlamentar, sgPartido, valor)
 
+
 gastos_deputados %>%
   filter(valor > 485.0000)%>%
   ggplot(aes(fct_reorder(NomeParlamentar, valor), valor, fill = sgPartido))+
@@ -107,6 +110,7 @@ gastos_deputados %>%
   xlab("")+
   ggtitle("OS 10 DEPUTADOS FEDERAIS QUE MENOS GASTARAM EM 2019")
 
+# GASTOS POR ESTADO
 
 gastos_estados <- df2 %>%
   filter(numMes > 1 & !is.na(cpf)) %>%
@@ -115,7 +119,8 @@ gastos_estados <- df2 %>%
   arrange(desc(valor)) %>%
   select(sgUF, valor)
 
-# grafico de gastos dos estados
+# GRAFICO DE GASTOS POR ESTADO
+
 gastos_estados  %>%
   ggplot(aes(fct_reorder(sgUF , valor), valor, ymin =0, ymax = valor))+
   geom_point()+
